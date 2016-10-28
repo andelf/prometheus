@@ -213,9 +213,9 @@ PromConsole.TimeControl.prototype.getOrSetEndDate = function() {
 };
 
 PromConsole.TimeControl.prototype.getHumanDate = function(date) {
-  var hours = date.getUTCHours() < 10 ? '0' + date.getUTCHours() : date.getUTCHours();
-  var minutes = date.getUTCMinutes() < 10 ? '0' + date.getUTCMinutes() : date.getUTCMinutes();
-  return date.getUTCFullYear() + "-" + (date.getUTCMonth()+1) + "-" + date.getUTCDate() + " " +
+  var hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
+  var minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
+  return date.getFullYear() + "-" + (date.getMonth()+1) + "-" + date.getDate() + " " +
       hours + ":" + minutes;
 };
 
@@ -520,7 +520,7 @@ PromConsole.Graph.prototype.dispatch = function() {
   for (var i = 0; i < this.params.expr.length; ++i) {
     var endTime = this.params.endTime;
     var url = PATH_PREFIX + "/api/v1/query_range?query=" + encodeURIComponent(this.params.expr[i]) +
-      "&step=" + this.params.duration / this.graphTd.offsetWidth + 
+      "&step=" + this.params.duration / this.graphTd.offsetWidth +
       "&start=" + (endTime - this.params.duration) + "&end=" + endTime;
     var xhr = new XMLHttpRequest();
     xhr.open('get', url, true);
@@ -592,7 +592,7 @@ PromConsole._chooseNameFunction = function(data) {
     }
     return name + "}";
   };
-  
+
   // If only one label varies, use that value.
   var labelValues = {};
   for (var e = 0; e < data.length; e++) {
@@ -605,7 +605,7 @@ PromConsole._chooseNameFunction = function(data) {
       }
     }
   }
-  
+
   var multiValueLabels = [];
   for (var label in labelValues) {
     if (Object.keys(labelValues[label]).length > 1) {

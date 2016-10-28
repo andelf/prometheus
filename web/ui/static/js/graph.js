@@ -312,9 +312,9 @@ Prometheus.Graph.prototype.decreaseRange = function() {
 Prometheus.Graph.prototype.getEndDate = function() {
   var self = this;
   if (!self.endDate || !self.endDate.val()) {
-    return new Date();
+    return new Date().getTime();
   }
-  return self.endDate.data('datetimepicker').getDate().getTime();
+  return self.endDate.data('datetimepicker').getLocalDate().getTime();
 };
 
 Prometheus.Graph.prototype.getOrSetEndDate = function() {
@@ -326,7 +326,10 @@ Prometheus.Graph.prototype.getOrSetEndDate = function() {
 
 Prometheus.Graph.prototype.setEndDate = function(date) {
   var self = this;
-  self.endDate.data('datetimepicker').setValue(date);
+  if ((typeof date) == "number") {
+    date = new Date(date);
+  }
+  self.endDate.data('datetimepicker').setLocalDate(date);
 };
 
 Prometheus.Graph.prototype.increaseEnd = function() {
@@ -544,7 +547,10 @@ Prometheus.Graph.prototype.updateGraph = function() {
     min: "auto",
   });
 
-  var xAxis = new Rickshaw.Graph.Axis.Time({ graph: self.rickshawGraph });
+  var xAxis = new Rickshaw.Graph.Axis.Time({
+    graph: self.rickshawGraph,
+    timeFixture: new Rickshaw.Fixtures.Time.Local(),
+  });
 
   var yAxis = new Rickshaw.Graph.Axis.Y({
     graph: self.rickshawGraph,
@@ -558,10 +564,13 @@ Prometheus.Graph.prototype.updateGraph = function() {
   var hoverDetail = new Rickshaw.Graph.HoverDetail({
     graph: self.rickshawGraph,
     formatter: function(series, x, y) {
-      var date = '<span class="date">' + new Date(x * 1000).toUTCString() + '</span>';
+      var date = '<span class="date">' + new Date(x * 1000).toLocaleString(undefined, {hour12: false}) + '</span>';
       var swatch = '<span class="detail_swatch" style="background-color: ' + series.color + '"></span>';
       var content = swatch + (series.labels.__name__ || 'value') + ": <strong>" + y + '</strong>';
       return date + '<br>' + content + '<br>' + self.renderLabels(series.labels);
+    },
+    xFormatter: function(x) {
+      return new Date(x * 1000).toLocaleString(undefined, {hour12: false});
     }
   });
 
